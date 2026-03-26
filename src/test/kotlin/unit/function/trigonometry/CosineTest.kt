@@ -1,6 +1,5 @@
 package unit.function.trigonometry
 
-
 import function.trigonometry.Cosine
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -10,6 +9,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.PI
 import org.junit.jupiter.api.Assertions.assertEquals
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class CosineTest {
 
@@ -23,7 +23,7 @@ class CosineTest {
     @Test
     fun `cos(0) should be 1`() {
         val result = cosine.compute(BigDecimal.ZERO, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ONE))
+        assertBigDecimalEquals(BigDecimal.ONE, result)
     }
 
     @Test
@@ -31,14 +31,14 @@ class CosineTest {
         val pi = BigDecimal(PI.toString())
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val result = cosine.compute(halfPi, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO))
+        assertBigDecimalEquals(BigDecimal.ZERO, result)
     }
 
     @Test
     fun `cos(pi) should be -1`() {
         val pi = BigDecimal(PI.toString())
         val result = cosine.compute(pi, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ONE.negate()))
+        assertBigDecimalEquals(BigDecimal.ONE.negate(), result)
     }
 
     @Test
@@ -46,7 +46,7 @@ class CosineTest {
         val pi = BigDecimal(PI.toString())
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val result = cosine.compute(halfPi.negate(), PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO))
+        assertBigDecimalEquals(BigDecimal.ZERO, result)
     }
 
     @ParameterizedTest
@@ -55,7 +55,7 @@ class CosineTest {
         val xBD = BigDecimal(x.toString())
         val yBD = BigDecimal(y.toString())
         val result = cosine.compute(xBD, PRECISION)
-        assertEquals(0, result.compareTo(yBD), "cos($x) должен быть $y")
+        assertBigDecimalEquals(yBD, result, "cos($x) should be close to $y")
     }
 
     companion object {

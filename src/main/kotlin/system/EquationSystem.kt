@@ -16,7 +16,7 @@ class EquationSystem(
 ) : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
 
         if (x.compareTo(BigDecimal.ONE) == 0) {
             return BigDecimal.ZERO.setScale(precision.scale(), RoundingMode.HALF_EVEN)

@@ -9,7 +9,7 @@ import kotlin.math.PI
 class Sine : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
 
         val mc = MathContext(minOf(precision.scale() + 2, 16), RoundingMode.HALF_EVEN)
 

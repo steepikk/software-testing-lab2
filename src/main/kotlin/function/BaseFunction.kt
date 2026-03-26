@@ -3,9 +3,9 @@ package function
 import java.math.BigDecimal
 
 abstract class BaseFunction : Computable {
-    protected fun validate(x: BigDecimal, precision: BigDecimal) {
+    protected fun validatePrecision(precision: BigDecimal) {
         require(precision > BigDecimal.ZERO && precision < BigDecimal.ONE) {
-            "Точность должна быть между 0 и 1"
+            "Precision must be greater than 0 and less than 1. Current: $precision"
         }
     }
 

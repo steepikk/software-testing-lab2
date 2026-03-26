@@ -4,8 +4,6 @@ import org.mockito.Mockito.mock
 import function.log.BaseNLogarithm
 import function.log.NaturalLogarithm
 import function.trigonometry.Tangent
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -13,39 +11,44 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvFileSource
-import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.Mockito.spy
+import org.junit.jupiter.api.Assertions.assertTrue
 import system.EquationSystem
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.ln
 import kotlin.math.tan
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
+import testutil.BigDecimalAssertions.assertBigDecimalCloseTo
+import testutil.BigDecimalAssertions.assertBigDecimalCloseTo
 
 @ExtendWith(MockitoExtension::class)
 class EquationSystemIntegrationTest {
 
-    @Spy
     private lateinit var spyTangent: Tangent
 
-    @Spy
     private lateinit var spyLn: NaturalLogarithm
 
-    @Spy
     private lateinit var spyLog2: BaseNLogarithm
 
-    @Spy
     private lateinit var spyLog3: BaseNLogarithm
 
-    @Spy
     private lateinit var spyLog5: BaseNLogarithm
 
     private lateinit var system: EquationSystem
 
     @BeforeEach
     fun setUp() {
+        spyTangent = spy(Tangent())
+        spyLn = spy(NaturalLogarithm())
+        spyLog2 = spy(BaseNLogarithm(base = 2))
+        spyLog3 = spy(BaseNLogarithm(base = 3))
+        spyLog5 = spy(BaseNLogarithm(base = 5))
+
         system = EquationSystem(spyTangent, spyLn, spyLog2, spyLog3, spyLog5)
     }
 
@@ -54,10 +57,15 @@ class EquationSystemIntegrationTest {
     fun shouldCallOnlyTangentForNonPositiveX() {
         val x = BigDecimal("-2.5")
 
-        system.compute(x, PRECISION)
+        val result = system.compute(x, PRECISION)
 
         verify(spyTangent).compute(x, PRECISION)
         verifyNoInteractions(spyLn, spyLog2, spyLog3, spyLog5)
+
+        val tanValue = Tangent().compute(x, PRECISION)
+        val expected = tanValue.multiply(tanValue).setScale(PRECISION.scale(), RoundingMode.HALF_EVEN)
+        val tolerance = BigDecimal("1E-6")
+        assertBigDecimalCloseTo(expected, result, tolerance, "EquationSystem result should be close to expected")
     }
 
     @Test
@@ -65,10 +73,12 @@ class EquationSystemIntegrationTest {
     fun shouldCallOnlyTangentForZero() {
         val x = BigDecimal.ZERO
 
-        system.compute(x, PRECISION)
+        val result = system.compute(x, PRECISION)
 
         verify(spyTangent).compute(x, PRECISION)
         verifyNoInteractions(spyLn, spyLog2, spyLog3, spyLog5)
+
+        assertBigDecimalEquals(BigDecimal.ZERO.setScale(PRECISION.scale(), RoundingMode.HALF_EVEN), result)
     }
 
     @Test
@@ -77,13 +87,33 @@ class EquationSystemIntegrationTest {
         val x = BigDecimal("2.0")
         val highPrecision = PRECISION.setScale(PRECISION.scale() + 5, RoundingMode.HALF_EVEN)
 
-        system.compute(x, PRECISION)
+        val result = system.compute(x, PRECISION)
 
         verify(spyLn).compute(x, highPrecision)
         verify(spyLog2).compute(x, highPrecision)
         verify(spyLog3).compute(x, highPrecision)
         verify(spyLog5).compute(x, highPrecision)
         verifyNoInteractions(spyTangent)
+
+        val lnValue = NaturalLogarithm().compute(x, highPrecision)
+        val log2Value = BaseNLogarithm(2).compute(x, highPrecision)
+        val log3Value = BaseNLogarithm(3).compute(x, highPrecision)
+        val log5Value = BaseNLogarithm(5).compute(x, highPrecision)
+
+        val part1 = (log5Value * log3Value) / log2Value
+        val part2 = part1 * lnValue
+        val denominator = log2Value + lnValue + lnValue
+        val part3 = part2 / denominator
+        val expected = part3 * part3
+            .setScale(PRECISION.scale(), RoundingMode.HALF_EVEN)
+
+        val tolerance = BigDecimal("1E-5")
+        assertBigDecimalCloseTo(
+            expected,
+            result,
+            tolerance,
+            "EquationSystem result should be close to expected"
+        )
     }
 
     @Test
@@ -93,7 +123,7 @@ class EquationSystemIntegrationTest {
 
         val result = system.compute(x, PRECISION)
 
-        assertEquals(BigDecimal.ZERO.setScale(PRECISION.scale(), RoundingMode.HALF_EVEN), result)
+        assertBigDecimalEquals(BigDecimal.ZERO.setScale(PRECISION.scale(), RoundingMode.HALF_EVEN), result)
         verifyNoInteractions(spyTangent, spyLn, spyLog2, spyLog3, spyLog5)
     }
 
@@ -141,7 +171,7 @@ class EquationSystemIntegrationTest {
         val result = systemWithMocks.compute(x, PRECISION)
 
         val expectedScaled = expected.setScale(PRECISION.scale(), RoundingMode.HALF_EVEN)
-        assertEquals(expectedScaled, result)
+        assertBigDecimalEquals(expectedScaled, result)
     }
 
     @Test
@@ -151,7 +181,7 @@ class EquationSystemIntegrationTest {
 
         val mockTangent = mock(Tangent::class.java)
         `when`(mockTangent.compute(x, PRECISION))
-            .thenThrow(IllegalArgumentException("Тангенс не определен"))
+            .thenThrow(IllegalArgumentException("Tangent is not defined"))
 
         val systemWithMock = EquationSystem(mockTangent, spyLn, spyLog2, spyLog3, spyLog5)
 
@@ -159,7 +189,7 @@ class EquationSystemIntegrationTest {
             systemWithMock.compute(x, PRECISION)
         }
 
-        assertTrue(exception.message?.contains("не определен") ?: false)
+        assertTrue(exception.message?.contains("not defined") ?: false)
     }
 
     @Test
@@ -170,7 +200,7 @@ class EquationSystemIntegrationTest {
 
         val mockLn = mock(NaturalLogarithm::class.java)
         `when`(mockLn.compute(x, highPrecision))
-            .thenThrow(IllegalArgumentException("Натуральный логарифм не определен"))
+            .thenThrow(IllegalArgumentException("Natural logarithm is not defined"))
 
         val systemWithMock = EquationSystem(spyTangent, mockLn, spyLog2, spyLog3, spyLog5)
 
@@ -178,7 +208,7 @@ class EquationSystemIntegrationTest {
             systemWithMock.compute(x, PRECISION)
         }
 
-        assertTrue(exception.message?.contains("не определен") ?: false)
+        assertTrue(exception.message?.contains("not defined") ?: false)
     }
 
     private companion object {

@@ -4,6 +4,7 @@ import function.Computable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import util.CSVGraphWriter
 import java.io.File
@@ -40,10 +41,10 @@ class CSVGraphWriterTest {
 
         writer.write(x1, x2, step, precision)
 
-        assertTrue(outputFile.exists(), "Файл должен быть создан")
+        assertTrue(outputFile.exists(), "File must be created")
 
         val lines = outputFile.readLines()
-        assertEquals(4, lines.size, "Должно быть 4 строки: заголовок + 3 значения")
+        assertEquals(4, lines.size, "Should be 4 lines: header + 3 values")
 
         assertEquals("x, y", lines[0])
         assertEquals("1.000000,2.000000", lines[1])
@@ -86,14 +87,39 @@ class CSVGraphWriterTest {
                 BigDecimal("1E-6")
             )
 
-            assertTrue(file.exists(), "Файл должен быть создан")
-            assertEquals(file.parentFile?.exists(), true, "Папка plots должна быть создана")
+            assertTrue(file.exists(), "File must be created")
+            assertEquals(file.parentFile?.exists(), true, "The plots directory should be created")
         } finally {
             file.delete()
             file.parentFile?.delete()
         }
     }
 
+    @Test
+    fun `should throw when step is zero`() {
+        val writer = CSVGraphWriter(stubComputable(), tempDir.toString(), "test")
+        assertThrows<IllegalArgumentException> {
+            writer.write(
+                BigDecimal("1.0"),
+                BigDecimal("2.0"),
+                BigDecimal.ZERO,
+                BigDecimal("1E-6")
+            )
+        }
+    }
+
+    @Test
+    fun `should throw when step is negative`() {
+        val writer = CSVGraphWriter(stubComputable(), tempDir.toString(), "test")
+        assertThrows<IllegalArgumentException> {
+            writer.write(
+                BigDecimal("1.0"),
+                BigDecimal("2.0"),
+                BigDecimal("-1.0"),
+                BigDecimal("1E-6")
+            )
+        }
+    }
 
     private fun stubComputable(): Computable = object : Computable {
         override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {

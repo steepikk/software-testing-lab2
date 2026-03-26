@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvFileSource
 import system.EquationSystem
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class EquationSystemTest {
 
@@ -29,14 +30,14 @@ class EquationSystemTest {
     @Test
     fun `f(0) should be tan^2(0) = 0`() {
         val result = system.compute(BigDecimal.ZERO, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO), "f(0) должен быть 0")
+        assertBigDecimalEquals(BigDecimal.ZERO, result, "f(0) should be 0")
     }
 
     @Test
     fun `f(-pi) should be tan^2(-pi) = 0`() {
         val pi = BigDecimal(PI.toString())
         val result = system.compute(pi.negate(), PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO), "f(-π) должен быть 0")
+        assertBigDecimalEquals(BigDecimal.ZERO, result, "f(-π) should be 0")
     }
 
     @Test
@@ -54,14 +55,14 @@ class EquationSystemTest {
         val x = BigDecimal("0.0001")
         val result = system.compute(x, PRECISION)
 
-        assertTrue(result < BigDecimal("100"), "f(0.0001) слишком большое: $result")
+        assertTrue(result < BigDecimal("100"), "f(0.0001) is too large: $result")
     }
 
     @Test
     fun `f(x) for large x should be small`() {
         val x = BigDecimal("1000")
         val result = system.compute(x, PRECISION)
-        assertTrue(result < BigDecimal("0.7"), "f(1000) = $result, ожидалось < 0.7")
+        assertTrue(result < BigDecimal("0.7"), "f(1000) = $result, expected < 0.7")
     }
 
     @ParameterizedTest
@@ -72,6 +73,6 @@ class EquationSystemTest {
         val result = system.compute(xBD, PRECISION).setScale(7, RoundingMode.HALF_EVEN)
         val expected = yBD.setScale(7, RoundingMode.HALF_EVEN)
 
-        assertEquals(expected, result, "f($x) должен быть ≈ $y")
+        assertBigDecimalEquals(expected, result, "f($x) should be close to ≈ $y")
     }
 }

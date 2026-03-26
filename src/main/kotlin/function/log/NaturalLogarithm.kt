@@ -8,10 +8,10 @@ import java.math.RoundingMode
 class NaturalLogarithm : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
 
         require(x > BigDecimal.ZERO) {
-            "Натуральный логарифм не определен при x = $x"
+            "Natural logarithm is not defined for x = $x"
         }
 
         return when {

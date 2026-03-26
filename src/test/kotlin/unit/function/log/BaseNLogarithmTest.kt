@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.CsvFileSource
 import java.math.BigDecimal
 import java.math.RoundingMode
 import org.junit.jupiter.api.Assertions.assertEquals
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class BaseNLogarithmTest {
 
@@ -36,7 +37,7 @@ class BaseNLogarithmTest {
     @Test
     fun `should calculate log5(1) = 0`() {
         val result = log5.compute(BigDecimal.ONE, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO), "log₅(1) должен быть 0")
+        assertBigDecimalEquals(BigDecimal.ZERO, result, "log₅(1) should be 0")
     }
 
     @Test
@@ -61,7 +62,7 @@ class BaseNLogarithmTest {
     fun `log5(x) from csv`(x: BigDecimal, y: BigDecimal) {
         val result = log5.compute(x, PRECISION).setScale(SCALE, RoundingMode.HALF_EVEN)
         val expected = y.setScale(SCALE, RoundingMode.HALF_EVEN)
-        assertEquals(expected, result, "log₅($x) должен быть ≈ $y")
+        assertBigDecimalEquals(expected, result, "log₅($x) should be ≈ $y")
     }
 
     companion object {

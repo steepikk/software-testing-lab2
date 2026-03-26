@@ -3,7 +3,6 @@ package integration.function.trigonometry
 import function.trigonometry.Cosine
 import function.trigonometry.Sine
 import function.trigonometry.Tangent
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +20,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.cos
 import kotlin.math.sin
+import testutil.BigDecimalAssertions.assertBigDecimalCloseTo
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 @ExtendWith(MockitoExtension::class)
 class TangentIntegrationTest {
@@ -49,10 +50,17 @@ class TangentIntegrationTest {
     fun shouldCallSineAndCosine() {
         val x = BigDecimal("1.5")
 
-        tangent.compute(x, PRECISION)
+        val result = tangent.compute(x, PRECISION)
 
         verify(spySine).compute(x, PRECISION.setScale(PRECISION.scale() + 5))
         verify(spyCosine).compute(x, PRECISION.setScale(PRECISION.scale() + 5))
+
+        val highPrecision = PRECISION.setScale(PRECISION.scale() + 5, RoundingMode.HALF_EVEN)
+        val sinValue = BigDecimal(sin(x.toDouble())).setScale(highPrecision.scale(), RoundingMode.HALF_EVEN)
+        val cosValue = BigDecimal(cos(x.toDouble())).setScale(highPrecision.scale(), RoundingMode.HALF_EVEN)
+        val expected = sinValue.divide(cosValue, PRECISION.scale(), RoundingMode.HALF_EVEN)
+        val tolerance = BigDecimal("1E-6")
+        assertBigDecimalCloseTo(expected, result, tolerance, "Tangent result should be close to expected")
     }
 
     @ParameterizedTest
@@ -73,7 +81,7 @@ class TangentIntegrationTest {
         tangent = Tangent(mockSine, mockCosine)
         val result = tangent.compute(x, PRECISION)
 
-        assertEquals(expected, result)
+        assertBigDecimalEquals(expected, result)
     }
 
     @Test
@@ -93,7 +101,7 @@ class TangentIntegrationTest {
             tangent.compute(x, PRECISION)
         }
         assertTrue(
-            exception.message?.contains("не определен") ?: false
+            exception.message?.contains("not defined") ?: false
         )
     }
 

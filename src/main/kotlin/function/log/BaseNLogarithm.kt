@@ -15,7 +15,7 @@ class BaseNLogarithm(
     }
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
         return computeLogarithm(x, precision)
     }
 
@@ -23,8 +23,8 @@ class BaseNLogarithm(
      * Проверка корректности основания: base > 0 и base ≠ 1
      */
     private fun validateBase() {
-        require(base > 0) { "Основание логарифма должно быть > 0, текущее: $base" }
-        require(base != 1) { "Основание логарифма не может быть 1, текущее: $base" }
+        require(base > 0) { "Logarithm base must be > 0. Current: $base" }
+        require(base != 1) { "Logarithm base cannot be 1. Current: $base" }
     }
 
     /**

@@ -10,7 +10,7 @@ class Tangent(
 ) : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
 
         val highPrecision = precision.setScale(precision.scale() + 5, RoundingMode.HALF_EVEN)
 
@@ -18,7 +18,7 @@ class Tangent(
         val cosValue = cosine.compute(x, highPrecision)
 
         require(cosValue.abs() >= precision) {
-            "Тангенс не определен при x = $x (cos(x) ≈ 0)"
+            "Tangent is not defined for x = $x (cos(x) is approximately 0)"
         }
 
         return sinValue.divide(cosValue, precision.scale(), RoundingMode.HALF_EVEN)

@@ -76,7 +76,7 @@ class LogIntegrationTest {
         val highPrecision = PRECISION.setScale(PRECISION.scale() + 5, RoundingMode.HALF_EVEN)
 
         `when`(mockNaturalLog.compute(x, highPrecision))
-            .thenThrow(IllegalArgumentException("Натуральный логарифм не определен при x = 0"))
+            .thenThrow(IllegalArgumentException("Natural logarithm is not defined for x = 0"))
 
         logBase5 = BaseNLogarithm(base = 5, naturalLog = mockNaturalLog)
 
@@ -84,7 +84,7 @@ class LogIntegrationTest {
             logBase5.compute(x, PRECISION)
         }
 
-        assertTrue(exception.message?.contains("не определен") ?: false)
+        assertTrue(exception.message?.contains("not defined") ?: false)
     }
 
     private companion object {

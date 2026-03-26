@@ -14,6 +14,7 @@ class CSVGraphWriter(
     val filePath: String = File(outputDir, "$fileName.csv").path
 
     fun write(x1: BigDecimal, x2: BigDecimal, step: BigDecimal, precision: BigDecimal) {
+        require(step > BigDecimal.ZERO) { "Step must be positive, current: $step" }
         val file = File(filePath)
         file.parentFile?.mkdirs()
         FileWriter(file, false).use { writer ->

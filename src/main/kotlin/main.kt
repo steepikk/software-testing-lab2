@@ -30,7 +30,7 @@ fun main() {
     )
 
     functions.forEach { (computable, displayName, fileName) ->
-        print("Генерация для $displayName")
+        print("Generating for $displayName")
 
         val writer = CSVGraphWriter(computable, outputDir, fileName)
 
@@ -42,6 +42,6 @@ fun main() {
 
         println("→ $fileName.csv")
     }
-    println("CSV файлы сохранены в: $outputDir")
+    println("CSV files have been saved to: $outputDir")
 }
 

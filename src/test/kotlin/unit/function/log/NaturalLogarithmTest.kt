@@ -11,6 +11,7 @@ import java.math.RoundingMode
 import kotlin.math.ln
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class NaturalLogarithmTest {
 
@@ -38,7 +39,7 @@ class NaturalLogarithmTest {
     @Test
     fun `should calculate ln(1) = 0`() {
         val result = ln.compute(BigDecimal.ONE, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO), "ln(1) должен быть 0")
+        assertBigDecimalEquals(BigDecimal.ZERO, result, "ln(1) should be 0")
     }
 
     @ParameterizedTest(name = "ln({0})")
@@ -51,7 +52,7 @@ class NaturalLogarithmTest {
         val expectedBD = BigDecimal(expectedDouble.toString()).setScale(SCALE, RoundingMode.HALF_EVEN)
         val actualBD = ln.compute(xBD, PRECISION).setScale(SCALE, RoundingMode.HALF_EVEN)
 
-        assertEquals(expectedBD, actualBD, "ln($x) должен быть ≈ $expectedDouble")
+        assertEquals(expectedBD, actualBD, "ln($x) should be close to $expectedDouble")
     }
 
     @Test
@@ -61,7 +62,7 @@ class NaturalLogarithmTest {
         val tolerance = BigDecimal("0.0001")
 
         val diff = result.subtract(BigDecimal.ONE).abs()
-        assert(diff <= tolerance) { "ln(e) = $result, ожидалось ≈1, разница = $diff" }
+        assert(diff <= tolerance) { "ln(e) = $result, expected ≈ 1, diff = $diff" }
     }
 
     companion object {

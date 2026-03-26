@@ -5,12 +5,12 @@ import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
 
-class Cosine : BaseFunction() {
-
+class Cosine(
     private val sine: Sine = Sine()
+) : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
-        validate(x, precision)
+        validatePrecision(precision)
 
         val mathContext = MathContext(precision.scale() + 2, RoundingMode.HALF_EVEN)
         val piHalf = getPiHalf(mathContext)

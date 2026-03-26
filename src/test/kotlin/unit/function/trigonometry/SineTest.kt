@@ -9,6 +9,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.PI
 import org.junit.jupiter.api.Assertions.assertEquals
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class SineTest {
 
@@ -31,14 +32,14 @@ class SineTest {
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val expected = BigDecimal.ONE
         val result = sine.compute(halfPi, PRECISION)
-        assertEquals(expected, result.stripTrailingZeros())
+        assertBigDecimalEquals(expected, result)
     }
 
     @Test
     fun `sin(pi) should be 0`() {
         val pi = BigDecimal(PI.toString())
         val result = sine.compute(pi, PRECISION)
-        assertEquals(BigDecimal.ZERO, result.stripTrailingZeros())
+        assertBigDecimalEquals(BigDecimal.ZERO, result)
     }
 
     @Test
@@ -47,7 +48,7 @@ class SineTest {
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val expected = BigDecimal.ONE.negate()
         val result = sine.compute(halfPi.negate(), PRECISION)
-        assertEquals(expected, result.stripTrailingZeros())
+        assertBigDecimalEquals(expected, result)
     }
 
     @ParameterizedTest
@@ -56,7 +57,7 @@ class SineTest {
         val xBD = BigDecimal(x.toString())
         val yBD = BigDecimal(y.toString())
         val result = sine.compute(xBD, PRECISION)
-        assertEquals(yBD.stripTrailingZeros(), result.stripTrailingZeros(), "sin($x) должен быть $y")
+        assertBigDecimalEquals(yBD, result, "sin($x) should be close to $y")
     }
 
     companion object {

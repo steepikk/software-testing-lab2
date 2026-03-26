@@ -10,6 +10,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.PI
 import org.junit.jupiter.api.Assertions.assertEquals
+import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class TangentTest {
 
@@ -23,7 +24,7 @@ class TangentTest {
     @Test
     fun `tan(0) should be 0`() {
         val result = tangent.compute(BigDecimal.ZERO, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO))
+        assertBigDecimalEquals(BigDecimal.ZERO, result)
     }
 
     @Test
@@ -31,7 +32,7 @@ class TangentTest {
         val pi = BigDecimal(PI.toString())
         val piOver4 = pi.divide(BigDecimal("4"), SCALE, RoundingMode.HALF_EVEN)
         val result = tangent.compute(piOver4, PRECISION) - PRECISION
-        assertEquals(0, result.compareTo(BigDecimal.ONE))
+        assertBigDecimalEquals(BigDecimal.ONE, result)
     }
 
     @Test
@@ -39,18 +40,18 @@ class TangentTest {
         val pi = BigDecimal(PI.toString())
         val piOver4 = pi.divide(BigDecimal("4"), SCALE, RoundingMode.HALF_EVEN)
         val result = tangent.compute(piOver4.negate(), PRECISION) + PRECISION
-        assertEquals(0, result.compareTo(BigDecimal.ONE.negate()))
+        assertBigDecimalEquals(BigDecimal.ONE.negate(), result)
     }
 
     @Test
     fun `tan(pi) should be 0`() {
         val pi = BigDecimal(PI.toString())
         val result = tangent.compute(pi, PRECISION)
-        assertEquals(0, result.compareTo(BigDecimal.ZERO))
+        assertBigDecimalEquals(BigDecimal.ZERO, result)
     }
 
     @Test
-    fun `tan(x) should throw when cos(x) = 0` () {
+    fun `tan(x) should throw when cos(x) = 0`() {
         val pi = BigDecimal(PI.toString())
         val piHalf = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
 
@@ -73,7 +74,7 @@ class TangentTest {
         val xBD = BigDecimal(x.toString())
         val yBD = BigDecimal(y.toString())
         val result = tangent.compute(xBD, PRECISION)
-        assertEquals(0, result.compareTo(yBD), "tan($x) должен быть $y")
+        assertBigDecimalEquals(yBD, result, "tan($x) should be close to $y")
     }
 
     companion object {

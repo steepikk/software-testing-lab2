@@ -11,7 +11,6 @@ class Tangent(
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
         validatePrecision(precision)
-
         val highPrecision = precision.setScale(precision.scale() + 5, RoundingMode.HALF_EVEN)
 
         val sinValue = sine.compute(x, highPrecision)

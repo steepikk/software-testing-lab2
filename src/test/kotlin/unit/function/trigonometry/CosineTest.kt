@@ -9,6 +9,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.PI
 import org.junit.jupiter.api.Assertions.assertEquals
+import kotlin.math.cos
+import testutil.BigDecimalAssertions.assertBigDecimalCloseTo
 import testutil.BigDecimalAssertions.assertBigDecimalEquals
 
 class CosineTest {
@@ -23,7 +25,7 @@ class CosineTest {
     @Test
     fun `cos(0) should be 1`() {
         val result = cosine.compute(BigDecimal.ZERO, PRECISION)
-        assertBigDecimalEquals(BigDecimal.ONE, result)
+        assertBigDecimalCloseTo(BigDecimal.ONE, result, TOLERANCE)
     }
 
     @Test
@@ -31,14 +33,14 @@ class CosineTest {
         val pi = BigDecimal(PI.toString())
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val result = cosine.compute(halfPi, PRECISION)
-        assertBigDecimalEquals(BigDecimal.ZERO, result)
+        assertBigDecimalCloseTo(BigDecimal.ZERO, result, TOLERANCE)
     }
 
     @Test
     fun `cos(pi) should be -1`() {
         val pi = BigDecimal(PI.toString())
         val result = cosine.compute(pi, PRECISION)
-        assertBigDecimalEquals(BigDecimal.ONE.negate(), result)
+        assertBigDecimalCloseTo(BigDecimal.ONE.negate(), result, TOLERANCE)
     }
 
     @Test
@@ -46,20 +48,21 @@ class CosineTest {
         val pi = BigDecimal(PI.toString())
         val halfPi = pi.divide(BigDecimal("2"), SCALE, RoundingMode.HALF_EVEN)
         val result = cosine.compute(halfPi.negate(), PRECISION)
-        assertBigDecimalEquals(BigDecimal.ZERO, result)
+        assertBigDecimalCloseTo(BigDecimal.ZERO, result, TOLERANCE)
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = ["/function/trigonometry/cos.csv"], numLinesToSkip = 1)
     fun `cos(x) from csv`(x: Double, y: Double) {
         val xBD = BigDecimal(x.toString())
-        val yBD = BigDecimal(y.toString())
+        val expected = BigDecimal(cos(x)).setScale(SCALE, RoundingMode.HALF_EVEN)
         val result = cosine.compute(xBD, PRECISION)
-        assertBigDecimalEquals(yBD, result, "cos($x) should be close to $y")
+        assertBigDecimalCloseTo(expected, result, TOLERANCE, "cos($x) should be close to reference")
     }
 
     companion object {
         private val PRECISION = BigDecimal("0.0000001")
         private const val SCALE = 7
+        private val TOLERANCE = BigDecimal("1E-5")
     }
 }

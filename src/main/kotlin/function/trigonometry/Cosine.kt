@@ -6,15 +6,13 @@ import java.math.MathContext
 import java.math.RoundingMode
 
 class Cosine(
-    private val sine: Sine = Sine()
+    private val sine: Sine = Sine(),
 ) : BaseFunction() {
 
     override fun compute(x: BigDecimal, precision: BigDecimal): BigDecimal {
         validatePrecision(precision)
-
         val mathContext = MathContext(precision.scale() + 2, RoundingMode.HALF_EVEN)
         val piHalf = getPiHalf(mathContext)
-
         val argument = piHalf - x
 
         return sine.compute(argument, precision)
